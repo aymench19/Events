@@ -17,7 +17,11 @@
             </tr>
             <tr>
                 <th>Status</th>
-                <td>{{ reservation.status }}</td>
+                <td>{{ reservation.status.value }}</td>
+            </tr>
+            <tr>
+                <th>Event</th>
+                <td>{{ reservation.event.title }}</td>
             </tr>
         </tbody>
     </table>

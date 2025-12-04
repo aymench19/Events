@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Event;
 use App\Entity\Reservation;
 use App\Form\ReservationType;
+use App\Repository\EventRepository;
 use App\Repository\ReservationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -23,10 +25,22 @@ final class ReservationController extends AbstractController
     }
 
     #[Route('/new', name: 'app_reservation_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, EventRepository $eventRepository): Response
     {
         $reservation = new Reservation();
-        $form = $this->createForm(ReservationType::class, $reservation);
+        
+        // Récupérer l'ID de l'événement depuis les paramètres
+        $eventId = $request->query->get('eventId');
+        if ($eventId) {
+            $event = $eventRepository->find($eventId);
+            if ($event) {
+                $reservation->setEvent($event);
+            }
+        }
+        
+        $form = $this->createForm(ReservationType::class, $reservation, [
+            'eventId' => $eventId,
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

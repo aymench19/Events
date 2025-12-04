@@ -14,11 +14,11 @@ class ReservationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('date')
             ->add('status')
             ->add('event', EntityType::class, [
                 'class' => Event::class,
-                'choice_label' => 'id',
+                'choice_label' => 'title',
+                'disabled' => !empty($options['eventId']),
             ])
         ;
     }
@@ -27,6 +27,7 @@ class ReservationType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Reservation::class,
+            'eventId' => null,
         ]);
     }
 }
