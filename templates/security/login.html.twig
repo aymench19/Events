@@ -1,0 +1,100 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Log in!{% endblock %}
+
+{% block body %}
+<form method="post">
+    {% set locked = lockout is defined and lockout.is_locked %}
+    {% set remaining = lockout is defined and lockout.remaining_time ? lockout.remaining_time : 0 %}
+
+    {% if error is defined and error %}
+        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+    {% endif %}
+
+    {% if locked %}
+        <div id="lockoutBox" class="alert alert-warning">
+            Too many failed attempts. Please wait <span id="lockoutTimer">{{ remaining }}</span> second(s) before trying again.
+        </div>
+    {% endif %}
+
+    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+    <label for="inputEmail">Email</label>
+    <input type="email" value="{{ last_username is defined ? last_username : '' }}" name="_username" id="inputEmail" class="form-control" autocomplete="email" required autofocus {% if locked %}disabled{% endif %}>
+    <label for="inputPassword">Password</label>
+    <input type="password" name="_password" id="inputPassword" class="form-control" autocomplete="current-password" required {% if locked %}disabled{% endif %}>
+    <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
+
+    <div class="checkbox mb-3">
+        <label>
+            <input type="checkbox" name="_remember_me" {% if locked %}disabled{% endif %}> Remember me
+        </label>
+    </div>
+
+    <button id="loginButton" class="btn btn-lg btn-primary" type="submit" {% if locked %}disabled{% endif %}>
+        Sign in
+    </button>
+</form>
+
+<p class="mt-3">
+    Don't have an account? <a href="{{ path('app_register') }}">Register here</a>
+</p>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        (function(){
+            const locked = {{ (lockout is defined and lockout.is_locked) ? 'true' : 'false' }};
+            let remaining = parseInt({{ (lockout is defined and lockout.remaining_time) ? lockout.remaining_time : 0 }});
+
+            if (locked !== 'true') return;
+
+            const timerEl = document.getElementById('lockoutTimer');
+            const loginBtn = document.getElementById('loginButton');
+            const emailInput = document.getElementById('inputEmail');
+            const passInput = document.getElementById('inputPassword');
+            const remember = document.querySelector('input[name="_remember_me"]');
+
+            function updateUI() {
+                if (timerEl) timerEl.textContent = remaining;
+                if (remaining <= 0) {
+                    // Re-enable form
+                    if (loginBtn) loginBtn.disabled = false;
+                    if (emailInput) emailInput.disabled = false;
+                    if (passInput) passInput.disabled = false;
+                    if (remember) remember.disabled = false;
+                    const box = document.getElementById('lockoutBox');
+                    if (box) box.style.display = 'none';
+                    clearInterval(intervalId);
+                }
+            }
+
+            updateUI();
+            const intervalId = setInterval(function(){
+                remaining = Math.max(0, remaining - 1);
+                updateUI();
+            }, 1000);
+
+            // Poll server every 5 seconds to refresh remaining time (useful across tabs)
+            const username = '{{ last_username is defined ? last_username|e('js') : '' }}';
+            if (username) {
+                const pollId = setInterval(async function(){
+                    try {
+                        const resp = await fetch(`/login/lockout-info?username=${encodeURIComponent(username)}`);
+                        if (!resp.ok) return;
+                        const json = await resp.json();
+                        if (typeof json.remaining_time !== 'undefined' && json.remaining_time !== null) {
+                            remaining = parseInt(json.remaining_time, 10);
+                            updateUI();
+                            if (remaining <= 0) {
+                                clearInterval(pollId);
+                            }
+                        }
+                    } catch (e) {
+                        // ignore polling errors
+                    }
+                }, 5000);
+            }
+        })();
+    </script>
+{% endblock %}

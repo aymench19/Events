@@ -1,0 +1,1500 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Event Dashboard - API Testing{% endblock %}
+
+{% block body %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Dashboard - API Testing & Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            color: #333;
+            font-size: 2em;
+        }
+
+        .user-info {
+            text-align: right;
+            color: #666;
+        }
+
+        .user-info .email {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .logout-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .nav-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-success {
+            background: #27ae60;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-color: #28a745;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-color: #bee5eb;
+        }
+
+        .response-box {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #333;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .ticket-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .ticket-card {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ticket-info {
+            flex: 1;
+        }
+
+        .ticket-info h3 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .ticket-meta {
+            color: #666;
+            font-size: 0.9em;
+            display: grid;
+            gap: 3px;
+        }
+
+        .ticket-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .sold-out {
+            background: #f5f5f5;
+            opacity: 0.6;
+            border-color: #ccc;
+        }
+
+        .sold-out .ticket-meta {
+            color: #e74c3c;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-card h4 {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .stat-card .value {
+            color: #667eea;
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        .payment-list {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f5f5f5;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+            border-bottom: 2px solid #ddd;
+            color: #333;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:hover {
+            background: #f9f9f9;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+
+        .badge-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-completed {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .badge-failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            line-height: 1.5;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .modal-close {
+            background: #95a5a6;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .nav-tabs {
+                flex-direction: column;
+            }
+
+            .nav-btn {
+                width: 100%;
+            }
+
+            .ticket-card {
+                flex-direction: column;
+            }
+
+            .ticket-actions {
+                margin-top: 10px;
+                width: 100%;
+            }
+
+            .ticket-actions button {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div>
+                <h1>🎫 Event Ticket System</h1>
+                <p style="color: #666; margin-top: 5px;">Professional API Testing & Management Dashboard</p>
+            </div>
+            <div class="user-info">
+                <div>Welcome back!</div>
+                <div class="email" id="userEmail">{{ app.user.email }}</div>
+                <form method="POST" action="{{ path('app_logout') }}" style="margin: 0;">
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <button class="nav-btn active" onclick="switchTab('dashboard')">📊 Dashboard</button>
+            <button class="nav-btn" onclick="switchTab('tickets')">🎟️ Manage Tickets</button>
+            <button class="nav-btn" onclick="switchTab('shop')">🎫 Shop Tickets</button>
+            <button class="nav-btn" onclick="switchTab('purchases')">🎟️ My Tickets</button>
+            <button class="nav-btn" onclick="switchTab('payments')">💳 Payment History</button>
+            <button class="nav-btn" onclick="switchTab('api-test')">🧪 API Testing</button>
+            <button class="nav-btn" onclick="switchTab('documentation')">📖 Documentation</button>
+        </div>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="section active">
+            <div class="card">
+                <h2>📊 Dashboard Overview</h2>
+                <div id="dashboardContent">
+                    <p>Loading dashboard data...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Manage Tickets Section -->
+        <section id="tickets" class="section">
+            <div class="card">
+                <h2>🎟️ Ticket Management</h2>
+
+                <div class="form-group">
+                    <label>Create New Ticket:</label>
+                    <button onclick="openCreateTicketModal()" class="btn-success">+ Create Ticket</button>
+                </div>
+
+                <div id="ticketsListContainer">
+                    <p>Loading your tickets...</p>
+                </div>
+            </div>
+
+            <!-- Create Ticket Modal -->
+            <div id="createTicketModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">Create New Ticket</div>
+
+                    <div class="form-group">
+                        <label>Event Name:</label>
+                        <input type="text" id="eventName" placeholder="e.g., Tech Conference 2025">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ticket Type:</label>
+                        <select id="ticketType">
+                            <option value="GENERAL">General Admission</option>
+                            <option value="VIP">VIP</option>
+                            <option value="STUDENT">Student</option>
+                            <option value="EARLY_BIRD">Early Bird</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Price ($):</label>
+                        <input type="number" id="ticketPrice" placeholder="99.99" step="0.01">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Quantity:</label>
+                        <input type="number" id="ticketQuantity" placeholder="100" value="100" min="1">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Expires At (Optional):</label>
+                        <input type="datetime-local" id="ticketExpires">
+                    </div>
+
+                    <div class="button-group">
+                        <button onclick="createTicket()" class="btn-success">Create Ticket</button>
+                        <button onclick="closeCreateTicketModal()" class="btn-secondary modal-close">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- View Payments Section -->
+        <section id="payments" class="section">
+            <div class="card">
+                <h2>💳 Payment History</h2>
+                <div id="paymentsListContainer">
+                    <p>Loading payments...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Shop Section - Browse & Buy Tickets -->
+        <section id="shop" class="section">
+            <div class="card">
+                <h2>🎫 Shop - Available Tickets</h2>
+                <div id="ticketsContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                    <div class="alert alert-info"><span class="loading"></span> Loading available tickets...</div>
+                </div>
+
+                <!-- Payment Modal -->
+                <div id="paymentModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center;">
+                    <div class="card" style="width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h2>💳 Checkout</h2>
+                            <button type="button" onclick="closePaymentModal()" style="background: none; border: none; font-size: 1.5em; cursor: pointer;">✕</button>
+                        </div>
+
+                        <!-- Order Summary -->
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                            <h4 style="margin-bottom: 10px;">📦 Order Summary</h4>
+                            <div id="orderSummary">
+                                <p>Event: <strong id="summaryEvent">-</strong></p>
+                                <p>Type: <strong id="summaryType">-</strong></p>
+                                <p>Quantity: <strong id="summaryQty">-</strong></p>
+                                <p style="font-size: 1.2em; font-weight: bold; color: #667eea; margin-top: 10px;">
+                                    Total: $<span id="summaryTotal">0.00</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Payment Form -->
+                        <form id="checkoutForm" style="display: flex; flex-direction: column; gap: 15px;">
+                            <input type="hidden" id="selectedTicketId" value="">
+                            <input type="hidden" id="selectedQuantity" value="">
+
+                            <!-- Card Number -->
+                            <div class="form-group">
+                                <label>Card Number</label>
+                                <input type="text" id="modalCardNumber" placeholder="4242 4242 4242 4242" maxlength="19" required>
+                                <small style="color: #999;">Test: 4242 4242 4242 4242</small>
+                            </div>
+
+                            <!-- Cardholder Name -->
+                            <div class="form-group">
+                                <label>Cardholder Name</label>
+                                <input type="text" id="modalCardHolder" placeholder="John Doe" required>
+                            </div>
+
+                            <!-- Expiry & CVC -->
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                                <div class="form-group">
+                                    <label>Month</label>
+                                    <select id="modalExpiryMonth" required>
+                                        {% for month in 1..12 %}
+                                            <option value="{{ "%02d"|format(month) }}">{{ "%02d"|format(month) }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Year</label>
+                                    <select id="modalExpiryYear" required>
+                                        {% for year in 2025..2035 %}
+                                            <option value="{{ year }}">{{ year }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>CVC</label>
+                                    <input type="text" id="modalCvc" placeholder="123" maxlength="4" required>
+                                </div>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <button type="submit" class="btn-success" style="padding: 12px; font-size: 1em; font-weight: bold;">
+                                Pay Now
+                            </button>
+
+                            <div id="checkoutError"></div>
+                            <div id="checkoutSuccess"></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Purchase History -->
+        <section id="purchases" class="section">
+            <div class="card">
+                <h2>🎟️ My Tickets</h2>
+                <div id="myTicketsContainer">
+                    <p>Loading your tickets...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- API Testing Section -->
+        <section id="api-test" class="section">
+            <div class="card">
+                <h2>🧪 API Testing Console</h2>
+
+                <div class="form-group">
+                    <label>API Endpoint:</label>
+                    <select id="apiEndpoint">
+                        <option value="">-- Select Endpoint --</option>
+                        <optgroup label="Tickets">
+                            <option value="GET:/api/tickets">GET - List All Tickets</option>
+                            <option value="POST:/api/tickets">POST - Create Ticket (ADMIN)</option>
+                            <option value="GET:/api/tickets/{id}">GET - Get Ticket Details</option>
+                            <option value="PUT:/api/tickets/{id}">PUT - Update Ticket</option>
+                            <option value="POST:/api/tickets/{id}/purchase">POST - Purchase Tickets</option>
+                            <option value="DELETE:/api/tickets/{id}">DELETE - Delete Ticket</option>
+                            <option value="GET:/api/tickets/stats/overview">GET - Ticket Statistics</option>
+                        </optgroup>
+                        <optgroup label="Payments">
+                            <option value="POST:/api/payment/process">POST - Process Payment</option>
+                            <option value="GET:/api/payment/status/{id}">GET - Payment Status</option>
+                            <option value="POST:/api/payment/validate-card">POST - Validate Card</option>
+                        </optgroup>
+                        <optgroup label="Auth">
+                            <option value="POST:/api/login">POST - Login</option>
+                            <option value="POST:/api/register">POST - Register</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Request Body (JSON):</label>
+                    <textarea id="requestBody" placeholder='{"key": "value"}' style="min-height: 150px;"></textarea>
+                </div>
+
+                <div class="button-group">
+                    <button onclick="executeAPI()" class="btn-success">Execute Request</button>
+                    <button onclick="clearAPIForm()" class="btn-secondary">Clear</button>
+                </div>
+
+                <div id="apiResponse"></div>
+            </div>
+        </section>
+
+        <!-- Documentation Section -->
+        <section id="documentation" class="section">
+            <div class="card">
+                <h2>📖 API Documentation</h2>
+
+                <div style="display: grid; gap: 20px;">
+                    <!-- Tickets API Docs -->
+                    <div style="border: 1px solid #ddd; padding: 15px; border-radius: 5px;">
+                        <h3>🎟️ Tickets API</h3>
+
+                        <h4 style="margin-top: 15px;">GET /api/tickets</h4>
+                        <p>Get all tickets for current user</p>
+                        <div class="code-block">Response: { success, count, tickets[] }</div>
+
+                        <h4 style="margin-top: 15px;">POST /api/tickets</h4>
+                        <p>Create new ticket (Admin only)</p>
+                        <div class="code-block">Body: {
+  "event_name": "Tech Conference",
+  "ticket_type": "VIP",
+  "price": "99.99",
+  "quantity": 100,
+  "expires_at": "2025-12-31T23:59:59"
+}</div>
+
+                        <h4 style="margin-top: 15px;">GET /api/tickets/{id}</h4>
+                        <p>Get single ticket details</p>
+
+                        <h4 style="margin-top: 15px;">PUT /api/tickets/{id}</h4>
+                        <p>Update ticket quantity or status</p>
+                        <div class="code-block">Body: {
+  "quantity": 50,
+  "status": "ACTIVE"
+}</div>
+
+                        <h4 style="margin-top: 15px;">POST /api/tickets/{id}/purchase</h4>
+                        <p>Purchase tickets (decrement quantity)</p>
+                        <div class="code-block">Body: {
+  "quantity": 5
+}</div>
+
+                        <h4 style="margin-top: 15px;">DELETE /api/tickets/{id}</h4>
+                        <p>Delete ticket</p>
+
+                        <h4 style="margin-top: 15px;">GET /api/tickets/stats/overview</h4>
+                        <p>Get ticket statistics (Admin only)</p>
+                    </div>
+
+                    <!-- Payments API Docs -->
+                    <div style="border: 1px solid #ddd; padding: 15px; border-radius: 5px;">
+                        <h3>💳 Payments API</h3>
+
+                        <h4 style="margin-top: 15px;">POST /api/payment/process</h4>
+                        <p>Process payment with card details</p>
+                        <div class="code-block">Body: {
+  "amount": 99.99,
+  "currency": "USD",
+  "card_number": "4111111111111111",
+  "expiry_month": 12,
+  "expiry_year": 2025,
+  "cvv": "123",
+  "first_name": "John",
+  "last_name": "Doe",
+  "event_name": "Conference",
+  "ticket_type": "VIP"
+}</div>
+
+                        <h4 style="margin-top: 15px;">GET /api/payment/status/{paymentId}</h4>
+                        <p>Check payment status and ticket info</p>
+
+                        <h4 style="margin-top: 15px;">POST /api/payment/validate-card</h4>
+                        <p>Validate card without processing</p>
+                    </div>
+
+                    <!-- Status Codes -->
+                    <div style="border: 1px solid #ddd; padding: 15px; border-radius: 5px;">
+                        <h3>📊 HTTP Status Codes</h3>
+                        <table>
+                            <tr>
+                                <th>Code</th>
+                                <th>Meaning</th>
+                            </tr>
+                            <tr>
+                                <td>200</td>
+                                <td>Success</td>
+                            </tr>
+                            <tr>
+                                <td>201</td>
+                                <td>Created</td>
+                            </tr>
+                            <tr>
+                                <td>400</td>
+                                <td>Bad Request</td>
+                            </tr>
+                            <tr>
+                                <td>401</td>
+                                <td>Unauthorized</td>
+                            </tr>
+                            <tr>
+                                <td>403</td>
+                                <td>Forbidden</td>
+                            </tr>
+                            <tr>
+                                <td>404</td>
+                                <td>Not Found</td>
+                            </tr>
+                            <tr>
+                                <td>429</td>
+                                <td>Too Many Requests (Brute Force Locked)</td>
+                            </tr>
+                            <tr>
+                                <td>500</td>
+                                <td>Server Error</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Get JWT Token from Twig template (passed from controller)
+        let jwtToken = '{{ jwt_token }}';
+        if (!jwtToken || jwtToken.trim() === '') {
+            jwtToken = null;
+        }
+
+        // Tab Switching
+        function switchTab(tabName) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Remove active class from buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected section
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+
+            // Load data based on tab
+            if (tabName === 'dashboard') {
+                loadDashboard();
+            } else if (tabName === 'tickets') {
+                loadTickets();
+            } else if (tabName === 'payments') {
+                loadPayments();
+            }
+        }
+
+        // Load Dashboard
+        async function loadDashboard() {
+            try {
+                const response = await fetch('/api/tickets', {
+                    headers: jwtToken ? { 'Authorization': `Bearer ${jwtToken}` } : {}
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const ticketCount = data.count || 0;
+                    const html = `
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <h4>Total Tickets</h4>
+                                <div class="value">${ticketCount}</div>
+                            </div>
+                            <div class="stat-card">
+                                <h4>Active Tickets</h4>
+                                <div class="value">${data.tickets ? data.tickets.filter(t => t.status === 'ACTIVE').length : 0}</div>
+                            </div>
+                            <div class="stat-card">
+                                <h4>Sold Out</h4>
+                                <div class="value">${data.tickets ? data.tickets.filter(t => t.sold_out).length : 0}</div>
+                            </div>
+                            <div class="stat-card">
+                                <h4>Total Inventory</h4>
+                                <div class="value">${data.tickets ? data.tickets.reduce((sum, t) => sum + t.quantity, 0) : 0}</div>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('dashboardContent').innerHTML = html;
+                } else {
+                    showAlert('Error loading dashboard', 'error');
+                }
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
+        // Load Tickets
+        async function loadTickets() {
+            try {
+                const response = await fetch('/api/tickets', {
+                    headers: jwtToken ? { 'Authorization': `Bearer ${jwtToken}` } : {}
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.tickets) {
+                    let html = '';
+
+                    if (data.tickets.length === 0) {
+                        html = '<p>No tickets found. Create your first ticket!</p>';
+                    } else {
+                        html = '<div class="ticket-list">';
+                        data.tickets.forEach(ticket => {
+                            const soldOutClass = ticket.sold_out ? 'sold-out' : '';
+                            html += `
+                                <div class="ticket-card ${soldOutClass}">
+                                    <div class="ticket-info">
+                                        <h3>${ticket.event_name}</h3>
+                                        <div class="ticket-meta">
+                                            <span>Type: ${ticket.ticket_type}</span>
+                                            <span>Price: $${ticket.price}</span>
+                                            <span>Available: ${ticket.quantity} tickets</span>
+                                            <span>Status: <span class="status-badge badge-${ticket.status.toLowerCase()}">${ticket.status}</span></span>
+                                            ${ticket.sold_out ? '<span style="color: red; font-weight: bold;">⚠️ SOLD OUT</span>' : ''}
+                                        </div>
+                                    </div>
+                                    <div class="ticket-actions">
+                                        <button onclick="editTicket(${ticket.id})" class="btn-secondary">Edit</button>
+                                        <button onclick="purchaseTicket(${ticket.id})" class="btn-success">Purchase</button>
+                                        <button onclick="deleteTicket(${ticket.id})" class="btn-danger">Delete</button>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        html += '</div>';
+                    }
+
+                    document.getElementById('ticketsListContainer').innerHTML = html;
+                } else {
+                    showAlert('Error loading tickets', 'error');
+                }
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
+        // Load Payments
+        async function loadPayments() {
+            try {
+                const response = await fetch('/api/tickets', { // Using tickets endpoint for now
+                    headers: jwtToken ? { 'Authorization': `Bearer ${jwtToken}` } : {}
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    let html = '<div class="payment-list"><table>';
+                    html += `<tr>
+                        <th>Event</th>
+                        <th>Type</th>
+                        <th>Amount</th>
+                        <th>Quantity</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>`;
+
+                    if (data.tickets && data.tickets.length > 0) {
+                        data.tickets.forEach(ticket => {
+                            const statusClass = ticket.status === 'ACTIVE' ? 'badge-active' : 'badge-completed';
+                            html += `<tr>
+                                <td>${ticket.event_name}</td>
+                                <td>${ticket.ticket_type}</td>
+                                <td>$${ticket.price}</td>
+                                <td>${ticket.quantity}</td>
+                                <td><span class="status-badge ${statusClass}">${ticket.status}</span></td>
+                                <td>${new Date(ticket.issued_at).toLocaleDateString()}</td>
+                            </tr>`;
+                        });
+                    } else {
+                        html += '<tr><td colspan="6" style="text-align: center;">No payments found</td></tr>';
+                    }
+
+                    html += '</table></div>';
+                    document.getElementById('paymentsListContainer').innerHTML = html;
+                }
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
+        // Create Ticket
+        async function createTicket() {
+            const eventName = document.getElementById('eventName').value;
+            const ticketType = document.getElementById('ticketType').value;
+            const price = document.getElementById('ticketPrice').value;
+            const quantity = document.getElementById('ticketQuantity').value;
+            const expiresAt = document.getElementById('ticketExpires').value;
+
+            if (!eventName || !price || !quantity) {
+                showAlert('Please fill all required fields', 'error');
+                return;
+            }
+
+            try {
+                const body = {
+                    event_name: eventName,
+                    ticket_type: ticketType,
+                    price: parseFloat(price),
+                    quantity: parseInt(quantity)
+                };
+
+                if (expiresAt) {
+                    body.expires_at = new Date(expiresAt).toISOString();
+                }
+
+                const response = await fetch('/api/tickets', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(jwtToken ? { 'Authorization': `Bearer ${jwtToken}` } : {})
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('Ticket created successfully!', 'success');
+                    closeCreateTicketModal();
+                    loadTickets();
+                    document.getElementById('eventName').value = '';
+                    document.getElementById('ticketPrice').value = '';
+                    document.getElementById('ticketQuantity').value = '100';
+                    document.getElementById('ticketExpires').value = '';
+                } else {
+                    showAlert('Error: ' + (data.error || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
+        // Purchase Ticket
+        async function purchaseTicket(ticketId) {
+            const quantity = prompt('How many tickets do you want to purchase?', '1');
+            if (!quantity) return;
+
+            try {
+                const response = await fetch(`/api/tickets/${ticketId}/purchase`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(jwtToken ? { 'Authorization': `Bearer ${jwtToken}` } : {})
+                    },
+                    body: JSON.stringify({ quantity: parseInt(quantity) })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('Ticket purchased successfully!', 'success');
+                    loadTickets();
+                } else {
+                    showAlert('Error: ' + (data.error || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
+        // Delete Ticket
+        async function deleteTicket(ticketId) {
+            if (!confirm('Are you sure you want to delete this ticket?')) return;
+
+            try {
+                const response = await fetch(`/api/tickets/${ticketId}`, {
+                    method: 'DELETE',
+                    headers: jwtToken ? { 'Authorization': `Bearer ${jwtToken}` } : {}
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('Ticket deleted successfully!', 'success');
+                    loadTickets();
+                } else {
+                    showAlert('Error: ' + (data.error || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
+        // Process Payment
+        // Load available tickets for shop
+        async function loadAvailableTickets() {
+            try {
+                const response = await fetch('/api/payment/available-tickets', {
+                    headers: {
+                        ...(jwtToken ? { 'Authorization': `Bearer ${jwtToken}` } : {})
+                    }
+                });
+
+                const data = await response.json();
+                const container = document.getElementById('ticketsContainer');
+
+                if (!data.success || !data.tickets || data.tickets.length === 0) {
+                    container.innerHTML = '<div class="alert alert-warning">No tickets available at the moment.</div>';
+                    return;
+                }
+
+                container.innerHTML = data.tickets.map(ticket => `
+                    <div style="border: 2px solid #e0e0e0; border-radius: 10px; padding: 20px; background: white; transition: all 0.3s;">
+                        <h3 style="color: #333; margin-bottom: 10px;">${ticket.event_name}</h3>
+                        <p style="color: #666; font-size: 0.9em; margin: 5px 0;">
+                            <strong>Type:</strong> ${ticket.ticket_type}
+                        </p>
+                        <p style="color: #667eea; font-size: 1.3em; font-weight: bold; margin: 10px 0;">
+                            $${parseFloat(ticket.price).toFixed(2)}
+                        </p>
+                        <p style="color: #666; margin: 5px 0;">
+                            <strong>Available:</strong> ${ticket.quantity} tickets
+                        </p>
+                        ${ticket.sold_out ? `
+                            <button type="button" disabled style="width: 100%; padding: 12px; background: #999; color: white; border: none; border-radius: 5px; cursor: not-allowed; font-weight: bold;">
+                                ❌ SOLD OUT
+                            </button>
+                        ` : `
+                            <button type="button" onclick="openPaymentModal(${ticket.id}, '${ticket.event_name}', '${ticket.ticket_type}', ${ticket.price}, ${ticket.quantity})" style="width: 100%; padding: 12px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px;">
+                                🛒 Buy Tickets
+                            </button>
+                        `}
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading tickets:', error);
+                document.getElementById('ticketsContainer').innerHTML = `
+                    <div class="alert alert-error">Error loading tickets: ${error.message}</div>
+                `;
+            }
+        }
+
+        // Open payment modal
+        function openPaymentModal(ticketId, eventName, ticketType, price, maxQty) {
+            document.getElementById('selectedTicketId').value = ticketId;
+            document.getElementById('summaryEvent').textContent = eventName;
+            document.getElementById('summaryType').textContent = ticketType;
+            document.getElementById('summaryQty').textContent = '1';
+            document.getElementById('selectedQuantity').value = '1';
+            document.getElementById('summaryTotal').textContent = price.toFixed(2);
+
+            // Create quantity selector
+            let qtyOptions = '';
+            for (let i = 1; i <= maxQty && i <= 10; i++) {
+                qtyOptions += `<option value="${i}">${i}</option>`;
+            }
+
+            // Clear form
+            document.getElementById('checkoutForm').reset();
+
+            // Show modal
+            document.getElementById('paymentModal').style.display = 'flex';
+
+            // Add quantity selector if not present
+            if (!document.getElementById('qtySelector')) {
+                const qtyDiv = document.createElement('div');
+                qtyDiv.className = 'form-group';
+                qtyDiv.id = 'qtySelector';
+                qtyDiv.innerHTML = `
+                    <label>Quantity</label>
+                    <select id="modalQuantity" onchange="updateTotal(${price})" required>
+                        ${qtyOptions}
+                    </select>
+                `;
+                document.getElementById('checkoutForm').insertBefore(qtyDiv, document.getElementById('checkoutForm').firstChild);
+            }
+        }
+
+        // Close payment modal
+        function closePaymentModal() {
+            document.getElementById('paymentModal').style.display = 'none';
+            document.getElementById('checkoutError').innerHTML = '';
+            document.getElementById('checkoutSuccess').innerHTML = '';
+        }
+
+        // Update total price
+        function updateTotal(unitPrice) {
+            const qty = parseInt(document.getElementById('modalQuantity').value);
+            const total = (unitPrice * qty).toFixed(2);
+            document.getElementById('summaryQty').textContent = qty;
+            document.getElementById('summaryTotal').textContent = total;
+            document.getElementById('selectedQuantity').value = qty;
+        }
+
+        // Handle checkout form submission
+        document.getElementById('checkoutForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const ticketId = document.getElementById('selectedTicketId').value;
+            const quantity = parseInt(document.getElementById('selectedQuantity').value);
+            const cardNumber = document.getElementById('modalCardNumber').value.replace(/\s/g, '');
+            const eventName = document.getElementById('summaryEvent').textContent;
+            const amount = parseFloat(document.getElementById('summaryTotal').textContent);
+
+            // Parse cardholder name
+            const cardHolder = document.getElementById('modalCardHolder').value.split(' ');
+            const firstName = cardHolder[0] || '';
+            const lastName = cardHolder.slice(1).join(' ') || '';
+
+            const body = {
+                ticket_id: parseInt(ticketId),
+                quantity: quantity,
+                card_number: cardNumber,
+                expiry_month: parseInt(document.getElementById('modalExpiryMonth').value),
+                expiry_year: parseInt(document.getElementById('modalExpiryYear').value),
+                cvv: document.getElementById('modalCvc').value,
+                first_name: firstName,
+                last_name: lastName,
+                amount: amount,
+                currency: 'USD',
+                event_name: eventName
+            };
+
+            const errorBox = document.getElementById('checkoutError');
+            const successBox = document.getElementById('checkoutSuccess');
+            errorBox.innerHTML = '';
+            successBox.innerHTML = '';
+
+            try {
+                const response = await fetch('/api/payment/process', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(jwtToken ? { 'Authorization': `Bearer ${jwtToken}` } : {})
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    successBox.innerHTML = `
+                        <div class="alert alert-success">
+                            <strong>✅ Payment Successful!</strong><br>
+                            Ticket Key: <code>${data.ticket.key}</code><br>
+                            Payment ID: <code>${data.payment.id}</code>
+                        </div>
+                    `;
+                    document.getElementById('checkoutForm').reset();
+                    loadAvailableTickets(); // Refresh ticket list
+                    loadUserTickets(); // Refresh user's tickets
+                    setTimeout(() => closePaymentModal(), 3000);
+                } else {
+                    errorBox.innerHTML = `
+                        <div class="alert alert-error">
+                            <strong>❌ Payment Failed</strong><br>
+                            ${data.error || 'Unknown error occurred'}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                errorBox.innerHTML = `
+                    <div class="alert alert-error">
+                        <strong>❌ Error: ${error.message}</strong>
+                    </div>
+                `;
+            }
+        });
+
+        // Load user's purchased tickets
+        async function loadUserTickets() {
+            try {
+                const response = await fetch('/api/tickets', {
+                    headers: {
+                        ...(jwtToken ? { 'Authorization': `Bearer ${jwtToken}` } : {})
+                    }
+                });
+
+                const data = await response.json();
+                const container = document.getElementById('myTicketsContainer');
+
+                if (!data.success || !data.tickets || data.tickets.length === 0) {
+                    container.innerHTML = '<p style="color: #999;">You haven\'t purchased any tickets yet.</p>';
+                    return;
+                }
+
+                container.innerHTML = data.tickets.map(ticket => `
+                    <div style="border-left: 4px solid #667eea; padding: 15px; background: #f9f9f9; margin-bottom: 10px; border-radius: 5px;">
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <div style="flex: 1;">
+                                <h4 style="margin: 0 0 10px 0;">${ticket.event_name}</h4>
+                                <p style="margin: 5px 0; color: #666;">
+                                    <strong>Ticket Key:</strong> <code style="background: #f0f0f0; padding: 2px 5px; border-radius: 3px;">${ticket.ticket_key}</code>
+                                </p>
+                                <p style="margin: 5px 0; color: #666;">
+                                    <strong>Type:</strong> ${ticket.ticket_type} | <strong>Price:</strong> $${ticket.price} | <strong>Status:</strong> ${ticket.status}
+                                </p>
+                                <p style="margin: 5px 0; color: #666;">
+                                    <strong>Issued:</strong> ${ticket.issued_at} | <strong>Expires:</strong> ${ticket.expires_at || 'Never'}
+                                </p>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button onclick="downloadTicket(${ticket.id})" style="background: #667eea; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; white-space: nowrap;">📥 Download PDF</button>
+                                <button onclick="viewQrCode(${ticket.id})" style="background: #764ba2; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; white-space: nowrap;">📱 QR Code</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading tickets:', error);
+            }
+        }
+
+        // Download ticket as PDF
+        async function downloadTicket(ticketId) {
+            try {
+                const response = await fetch(`/api/tickets/${ticketId}/download`, {
+                    headers: {
+                        ...(jwtToken ? { 'Authorization': `Bearer ${jwtToken}` } : {})
+                    }
+                });
+
+                if (!response.ok) {
+                    alert('Error downloading ticket');
+                    return;
+                }
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `ticket_${Date.now()}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            } catch (error) {
+                console.error('Error downloading ticket:', error);
+                alert('Failed to download ticket');
+            }
+        }
+
+        // View QR code
+        async function viewQrCode(ticketId) {
+            try {
+                const response = await fetch(`/api/tickets/${ticketId}/qrcode`, {
+                    headers: {
+                        ...(jwtToken ? { 'Authorization': `Bearer ${jwtToken}` } : {})
+                    }
+                });
+
+                if (!response.ok) {
+                    alert('Error loading QR code');
+                    return;
+                }
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+
+                // Show in modal
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                    background: rgba(0,0,0,0.7);
+                    display: flex; align-items: center; justify-content: center;
+                    z-index: 10000;
+                `;
+
+                modal.innerHTML = `
+                    <div style="background: white; padding: 30px; border-radius: 10px; max-width: 400px; text-align: center;">
+                        <h3 style="margin: 0 0 20px 0;">Ticket QR Code</h3>
+                        <img src="${url}" style="max-width: 300px; height: auto; margin-bottom: 20px;">
+                        <p style="color: #666; font-size: 12px;">Scan this code to verify your ticket</p>
+                        <button onclick="this.closest('div').parentElement.remove()" style="background: #667eea; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 10px;">Close</button>
+                    </div>
+                `;
+
+                document.body.appendChild(modal);
+            } catch (error) {
+                console.error('Error viewing QR code:', error);
+                alert('Failed to load QR code');
+            }
+        }
+
+        // Load shop when page loads
+        loadAvailableTickets();
+        loadUserTickets();
+
+        // Execute API Test
+        async function executeAPI() {
+            const endpoint = document.getElementById('apiEndpoint').value;
+            const requestBody = document.getElementById('requestBody').value;
+
+            if (!endpoint) {
+                showAlert('Please select an endpoint', 'error');
+                return;
+            }
+
+            const [method, path] = endpoint.split(':');
+            const responseBox = document.getElementById('apiResponse');
+            responseBox.innerHTML = '<div class="alert alert-info"><span class="loading"></span> Executing request...</div>';
+
+            try {
+                const options = {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(jwtToken ? { 'Authorization': `Bearer ${jwtToken}` } : {})
+                    }
+                };
+
+                if (method !== 'GET' && requestBody) {
+                    options.body = requestBody;
+                }
+
+                const response = await fetch(path, options);
+                const data = await response.json();
+
+                responseBox.innerHTML = `
+                    <div class="alert alert-success">
+                        <strong>${method} ${path}</strong><br>
+                        Status: ${response.status}
+                    </div>
+                    <div class="response-box">${JSON.stringify(data, null, 2)}</div>
+                `;
+            } catch (error) {
+                responseBox.innerHTML = `
+                    <div class="alert alert-error">
+                        <strong>Error: ${error.message}</strong>
+                    </div>
+                `;
+            }
+        }
+
+        // Clear API Form
+        function clearAPIForm() {
+            document.getElementById('apiEndpoint').value = '';
+            document.getElementById('requestBody').value = '';
+            document.getElementById('apiResponse').innerHTML = '';
+        }
+
+        // Modal Functions
+        function openCreateTicketModal() {
+            document.getElementById('createTicketModal').classList.add('active');
+        }
+
+        function closeCreateTicketModal() {
+            document.getElementById('createTicketModal').classList.remove('active');
+        }
+
+        // Show Alert
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.style.position = 'fixed';
+            alertDiv.style.top = '20px';
+            alertDiv.style.right = '20px';
+            alertDiv.style.maxWidth = '400px';
+            alertDiv.style.zIndex = '2000';
+            alertDiv.innerHTML = message;
+
+            document.body.appendChild(alertDiv);
+
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+
+        // Load data on page load
+        window.addEventListener('load', () => {
+            // Try to get JWT token from sessionStorage
+            const token = sessionStorage.getItem('jwt_token');
+            if (token) {
+                jwtToken = token;
+            }
+
+            loadDashboard();
+        });
+
+        // Close modal on outside click
+        document.getElementById('createTicketModal')?.addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeCreateTicketModal();
+            }
+        });
+    </script>
+</body>
+</html>
+{% endblock %}
