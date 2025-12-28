@@ -74,7 +74,7 @@ class BruteForceProtectionService
         if ($failedAttempts >= self::FAILED_ATTEMPTS_THRESHOLD) {
             $batchNumber = ceil($failedAttempts / self::FAILED_ATTEMPTS_THRESHOLD);
             $lockoutDuration = self::BASE_LOCKOUT_DURATION * pow(self::LOCKOUT_MULTIPLIER, $batchNumber - 1);
-            
+
             $loginAttempt->lockAccount((int)$lockoutDuration);
             $this->entityManager->flush();
 

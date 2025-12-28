@@ -42,7 +42,7 @@ class QrCodeService
             '<text x="150" y="150" font-size="14" text-anchor="middle" fill="black" font-family="monospace" font-weight="bold">' .
             $ticketDisplay .
             '</text></svg>';
-        
+
         return base64_encode($svg);
     }
 
@@ -78,53 +78,53 @@ class QrCodeService
 @page { margin: 0; size: A4; }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: Arial, sans-serif; color: #333; background: #f9f9f9; padding: 20px; }
-.ticket-container { 
-    background: white; 
-    max-width: 595px; 
-    margin: 0 auto; 
+.ticket-container {
+    background: white;
+    max-width: 595px;
+    margin: 0 auto;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
     page-break-after: always;
 }
-.header { 
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-    color: white; 
-    padding: 40px 30px; 
+.header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 40px 30px;
     text-align: center;
 }
 .header h1 { font-size: 32px; margin: 0 0 5px 0; font-weight: bold; }
 .header p { font-size: 14px; margin: 0; opacity: 0.9; }
 .content { padding: 40px 30px; }
 .section { margin-bottom: 30px; }
-.section-title { 
-    font-size: 12px; 
-    font-weight: bold; 
-    color: #667eea; 
-    text-transform: uppercase; 
+.section-title {
+    font-size: 12px;
+    font-weight: bold;
+    color: #667eea;
+    text-transform: uppercase;
     margin-bottom: 15px;
     letter-spacing: 1px;
 }
 .info-row { margin-bottom: 12px; display: flex; align-items: center; }
-.label { 
-    font-weight: bold; 
-    color: #555; 
+.label {
+    font-weight: bold;
+    color: #555;
     min-width: 130px;
     font-size: 14px;
 }
 .value { color: #333; font-size: 14px; }
 .divider { border-top: 2px dashed #ddd; margin: 20px 0; }
 .ticket-key-box {
-    text-align: center; 
+    text-align: center;
     margin: 20px 0;
     padding: 20px;
     background: #f5f5f5;
     border: 2px solid #667eea;
     border-radius: 5px;
 }
-.ticket-key { 
-    font-size: 18px; 
-    font-weight: bold; 
-    color: #667eea; 
-    font-family: "Courier New", monospace; 
+.ticket-key {
+    font-size: 18px;
+    font-weight: bold;
+    color: #667eea;
+    font-family: "Courier New", monospace;
     letter-spacing: 2px;
 }
 .price-box {
@@ -134,35 +134,35 @@ body { font-family: Arial, sans-serif; color: #333; background: #f9f9f9; padding
     color: #764ba2;
     margin: 10px 0;
 }
-.badge { 
+.badge {
     display: inline-block;
-    background: #667eea; 
-    color: white; 
-    padding: 6px 12px; 
-    border-radius: 4px; 
-    font-size: 12px; 
+    background: #667eea;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
     font-weight: bold;
 }
-.qr-section { 
-    text-align: center; 
+.qr-section {
+    text-align: center;
     margin: 30px 0;
     padding: 20px;
     background: #fafafa;
     border-radius: 5px;
 }
-.qr-code { 
-    max-width: 200px; 
+.qr-code {
+    max-width: 200px;
     height: auto;
     margin: 15px auto;
     border: 1px solid #ddd;
     padding: 10px;
     background: white;
 }
-.footer { 
-    background: #f0f0f0; 
-    padding: 20px; 
-    text-align: center; 
-    font-size: 12px; 
+.footer {
+    background: #f0f0f0;
+    padding: 20px;
+    text-align: center;
+    font-size: 12px;
     color: #666;
     border-top: 1px solid #ddd;
 }
@@ -184,11 +184,11 @@ body { font-family: Arial, sans-serif; color: #333; background: #f9f9f9; padding
         <div class="section">
             <div class="section-title">Event Information</div>
             <div class="info-row">
-                <span class="label">Event:</span> 
+                <span class="label">Event:</span>
                 <span class="value">' . $eventNameSafe . '</span>
             </div>
             <div class="info-row">
-                <span class="label">Type:</span> 
+                <span class="label">Type:</span>
                 <span class="badge">' . $ticketTypeSafe . '</span>
             </div>
         </div>
@@ -208,15 +208,15 @@ body { font-family: Arial, sans-serif; color: #333; background: #f9f9f9; padding
         <div class="section">
             <div class="section-title">Holder Information</div>
             <div class="info-row">
-                <span class="label">Name:</span> 
+                <span class="label">Name:</span>
                 <span class="value">' . $userNameSafe . '</span>
             </div>
             <div class="info-row">
-                <span class="label">Issued:</span> 
+                <span class="label">Issued:</span>
                 <span class="value">' . $issuedAt . '</span>
             </div>
             <div class="info-row">
-                <span class="label">Expires:</span> 
+                <span class="label">Expires:</span>
                 <span class="value">' . $expiresText . '</span>
             </div>
         </div>

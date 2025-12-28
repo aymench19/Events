@@ -130,7 +130,7 @@ class PaymentController extends AbstractController
 
                 // Return professional error message
                 $errorMessage = $paymentResult['error'];
-                
+
                 // Map common Stripe errors to user-friendly messages
                 $stripeErrorMap = [
                     'Your card has been declined' => 'Your card was declined. Please check your card details or use a different card.',

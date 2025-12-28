@@ -44,7 +44,7 @@ class StripeService
             if (!$tokenResult['success']) {
                 // Stripe token creation failed - card is invalid or doesn't exist
                 $error = $tokenResult['error'] ?? 'Card validation failed';
-                
+
                 // Map Stripe errors to user-friendly messages
                 if (stripos($error, 'card_declined') !== false || stripos($error, 'decline') !== false) {
                     $error = 'Your card was declined. Please check your card details or try a different card.';
@@ -59,7 +59,7 @@ class StripeService
                 } elseif (stripos($error, 'stolen_card') !== false) {
                     $error = 'This card has been reported as stolen. Please use a different card.';
                 }
-                
+
                 return [
                     'success' => false,
                     'error' => $error,
@@ -80,7 +80,7 @@ class StripeService
 
             if (!$paymentIntentResult['success']) {
                 $error = $paymentIntentResult['error'] ?? 'Payment failed';
-                
+
                 // Map common Stripe charge errors
                 if (stripos($error, 'card_declined') !== false) {
                     $error = 'Your card was declined by your bank. Please try a different card.';
@@ -99,7 +99,7 @@ class StripeService
                 } elseif (stripos($error, 'rate_limit') !== false) {
                     $error = 'Too many requests. Please wait a moment and try again.';
                 }
-                
+
                 return [
                     'success' => false,
                     'error' => $error,
@@ -159,7 +159,7 @@ class StripeService
 
             $error = $data['error']['message'] ?? 'Card validation failed';
             $errorCode = $data['error']['code'] ?? 'unknown';
-            
+
             return [
                 'success' => false,
                 'error' => $error,
@@ -204,7 +204,7 @@ class StripeService
 
             $error = $data['error']['message'] ?? 'Payment failed';
             $errorCode = $data['error']['code'] ?? 'unknown';
-            
+
             return [
                 'success' => false,
                 'error' => $error,

@@ -88,16 +88,16 @@ class Ticket
     public function getQuantity(): int { return $this->quantity; }
     public function setQuantity(int $quantity): static { $this->quantity = max(0, $quantity); return $this; }
 
-    public function decrementQuantity(int $amount = 1): static 
-    { 
-        $this->quantity = max(0, $this->quantity - $amount); 
-        return $this; 
+    public function decrementQuantity(int $amount = 1): static
+    {
+        $this->quantity = max(0, $this->quantity - $amount);
+        return $this;
     }
 
-    public function incrementQuantity(int $amount = 1): static 
-    { 
-        $this->quantity += $amount; 
-        return $this; 
+    public function incrementQuantity(int $amount = 1): static
+    {
+        $this->quantity += $amount;
+        return $this;
     }
 
     public function isSoldOut(): bool { return $this->quantity <= 0; }

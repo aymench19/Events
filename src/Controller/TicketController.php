@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Ticket;
+use App\Entity\User;
 use App\Repository\TicketRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -307,6 +308,7 @@ class TicketController extends AbstractController
         }
 
         try {
+            /** @var User|null $user */
             $user = $this->getUser();
             $userName = $user ? ($user->getFirstName() . ' ' . $user->getLastName()) : 'User';
 

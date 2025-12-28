@@ -17,7 +17,7 @@ class DashboardController extends AbstractController
     {
         $jwtToken = $request->getSession()->get('jwt_token');
         $userEmail = $request->getSession()->get('user_email');
-        
+
         return $this->render('dashboard.html.twig', [
             'jwt_token' => $jwtToken,
             'user_email' => $userEmail,

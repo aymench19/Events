@@ -77,7 +77,7 @@ class AuthController extends AbstractController
             $token = $jwtService->generateToken($user->getEmail(), $user->getRoles());
 
             $this->addFlash('success', 'Login successful');
-            
+
             // Store the token in session
             $request->getSession()->set('jwt_token', $token);
             $request->getSession()->set('user_email', $user->getEmail());
