@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Event: {{ event.title }}{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-md-8">
+            <h1>{{ event.title }}</h1>
+            <hr>
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Event Details</h5>
+                    <dl class="row">
+                        <dt class="col-sm-3">Date:</dt>
+                        <dd class="col-sm-9">{{ event.date ? event.date|date('Y-m-d H:i') : 'N/A' }}</dd>
+
+                        <dt class="col-sm-3">Capacity:</dt>
+                        <dd class="col-sm-9">{{ event.capacity }} available slots</dd>
+
+                        <dt class="col-sm-3">Price:</dt>
+                        <dd class="col-sm-9">${{ event.price|number_format(2) }}</dd>
+
+                        <dt class="col-sm-3">Reservations:</dt>
+                        <dd class="col-sm-9">{{ event.reservations|length }}</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a href="{{ path('app_event_index') }}" class="btn btn-secondary">Back to Events</a>
+                <a href="{{ path('app_event_edit', {'id': event.id}) }}" class="btn btn-warning">Edit</a>
+                <a href="{{ path('app_reservation_new', {'eventId': event.id}) }}" class="btn btn-success">Make a Reservation</a>
+                {{ include('event/_delete_form.html.twig') }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

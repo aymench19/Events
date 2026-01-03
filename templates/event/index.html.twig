@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Events{% endblock %}
+
+{% block body %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Events</h1>
+        <a href="{{ path('app_event_new') }}" class="btn btn-primary">+ Create New Event</a>
+    </div>
+
+    {% if events %}
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Title</th>
+                        <th>Date</th>
+                        <th>Capacity</th>
+                        <th>Price</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for event in events %}
+                    <tr>
+                        <td><strong>{{ event.title }}</strong></td>
+                        <td>{{ event.date ? event.date|date('Y-m-d H:i') : '-' }}</td>
+                        <td>{{ event.capacity }} slots</td>
+                        <td>${{ event.price|number_format(2) }}</td>
+                        <td>
+                            <a href="{{ path('app_event_show', {'id': event.id}) }}" class="btn btn-sm btn-info">View</a>
+                            <a href="{{ path('app_event_edit', {'id': event.id}) }}" class="btn btn-sm btn-warning">Edit</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info">No events found. <a href="{{ path('app_event_new') }}">Create one now!</a></div>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,15 @@
+{{ form_start(form) }}
+    <div class="mb-3">
+        {{ form_label(form.status) }}
+        {{ form_widget(form.status, {'attr': {'class': 'form-select'}}) }}
+        {{ form_errors(form.status) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.event) }}
+        {{ form_widget(form.event, {'attr': {'class': 'form-select'}}) }}
+        {{ form_errors(form.event) }}
+    </div>
+
+    <button class="btn btn-success" type="submit">{{ button_label|default('Save') }}</button>
+{{ form_end(form) }}

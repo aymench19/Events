@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Reservation #{{ reservation.id }}{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-md-8">
+            <h1>Reservation #{{ reservation.id }}</h1>
+            <hr>
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Reservation Details</h5>
+                    <dl class="row">
+                        <dt class="col-sm-3">Date:</dt>
+                        <dd class="col-sm-9">{{ reservation.date ? reservation.date|date('Y-m-d H:i') : 'N/A' }}</dd>
+
+                        <dt class="col-sm-3">Status:</dt>
+                        <dd class="col-sm-9">
+                            {% if reservation.status.value == 'CONFIRMED' %}
+                                <span class="badge bg-success">Confirmed</span>
+                            {% elseif reservation.status.value == 'PENDING' %}
+                                <span class="badge bg-warning">Pending</span>
+                            {% else %}
+                                <span class="badge bg-danger">Cancelled</span>
+                            {% endif %}
+                        </dd>
+
+                        <dt class="col-sm-3">Event:</dt>
+                        <dd class="col-sm-9">
+                            <a href="{{ path('app_event_show', {'id': reservation.event.id}) }}">
+                                {{ reservation.event.title }}
+                            </a>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a href="{{ path('app_reservation_index') }}" class="btn btn-secondary">Back to Reservations</a>
+                <a href="{{ path('app_reservation_edit', {'id': reservation.id}) }}" class="btn btn-warning">Edit</a>
+                {{ include('reservation/_delete_form.html.twig') }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
